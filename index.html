@@ -1,0 +1,2688 @@
+<!DOCTYPE html>
+<html lang="es" data-size="normal">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Quiz interactivo OLED Black de Ciberseguridad con estructura 3x3 y cuestionario gamificado">
+  <title>CyberSecurity 3x3 | OLED Black Quiz</title>
+  <style>
+    /* ==========================================================================
+       ESTILOS OLED BLACK PURO & RESPONSIVE MÓVIL
+       ========================================================================== */
+    :root {
+      --bg-oled: #000000;
+      --card-bg: #050505;
+      --surface-border: #1f1f1f;
+      --text-main: #f0f0f0;
+      --text-muted: #8e8e93;
+      --accent-green: #00ff88;
+      --accent-red: #ff3366;
+      --accent-cyan: #00d2ff;
+      --accent-yellow: #ffcc00;
+      --font-scale: 1rem;
+      --font-size-btn: 0.95rem;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --border-radius: 14px;
+    }
+
+    /* TAMAÑOS DE FUENTE CONTROLADOS (--A, -A, A, A+, A++) */
+    html[data-size="xxs"] { --font-scale: 0.78rem; --font-size-btn: 0.78rem; }
+    html[data-size="xs"]  { --font-scale: 0.88rem; --font-size-btn: 0.85rem; }
+    html[data-size="normal"] { --font-scale: 1.00rem; --font-size-btn: 0.95rem; }
+    html[data-size="xl"]  { --font-scale: 1.15rem; --font-size-btn: 1.05rem; }
+    html[data-size="xxl"] { --font-scale: 1.32rem; --font-size-btn: 1.18rem; }
+
+    /* MODO CONTRASTE EXTREMO */
+    body.extreme-contrast {
+      --bg-oled: #000000 !important;
+      --card-bg: #000000 !important;
+      --surface-border: #ffff00 !important;
+      --text-main: #ffff00 !important;
+      --text-muted: #ffffff !important;
+      --accent-green: #00ff00 !important;
+      --accent-red: #ff0055 !important;
+      --accent-cyan: #00ffff !important;
+      --accent-yellow: #ffff00 !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-oled);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: var(--font-scale);
+      line-height: 1.45;
+      padding-top: calc(var(--safe-top) + 60px);
+      padding-bottom: calc(var(--safe-bottom) + 75px);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* TOP BAR FIJA */
+    header.top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: calc(var(--safe-top) + 56px);
+      padding-top: var(--safe-top);
+      background-color: var(--bg-oled);
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 14px;
+      padding-right: 14px;
+      z-index: 1000;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      font-size: 1.05rem;
+      color: var(--accent-cyan);
+    }
+
+    .brand span.badge {
+      background: #111;
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* BOTONES DE CONTROL SUPERIORES */
+    .pill-btn {
+      background-color: #0d0d0d;
+      color: var(--text-main);
+      border: 1px solid var(--surface-border);
+      border-radius: 20px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pill-btn:active {
+      transform: scale(0.94);
+      background-color: #1a1a1a;
+    }
+
+    .pill-btn.active {
+      border-color: var(--accent-yellow);
+      color: var(--accent-yellow);
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    main.app-container {
+      flex: 1;
+      width: 100%;
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    /* PESTAÑAS INFERIORES PARA MÓVILES */
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(var(--safe-bottom) + 60px);
+      padding-bottom: var(--safe-bottom);
+      background-color: var(--bg-oled);
+      border-top: 1px solid var(--surface-border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .nav-tab {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      gap: 3px;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .nav-tab.active {
+      color: var(--accent-cyan);
+    }
+
+    .nav-tab svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.2;
+    }
+
+    /* VISTAS */
+    .view-section {
+      display: none;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SELECTOR DE TEMA */
+    .topic-selector-card {
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--border-radius);
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .topic-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    select.topic-dropdown {
+      width: 100%;
+      background: #000;
+      color: var(--text-main);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: var(--font-size-btn);
+      font-weight: 600;
+      outline: none;
+    }
+
+    /* TARJETAS 3x3 */
+    .scheme-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .scheme-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .block-card {
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--border-radius);
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    .block-header {
+      background: #0a0a0a;
+      border-bottom: 1px solid var(--surface-border);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .block-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .concept-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid #141414;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .concept-item:last-child {
+      border-bottom: none;
+    }
+
+    .concept-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .concept-content {
+      flex: 1;
+      font-size: calc(var(--font-scale) * 0.92);
+      color: var(--text-main);
+      user-select: text;
+    }
+
+    .concept-content strong {
+      color: #ffffff;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* VISTA DE QUIZ */
+    .quiz-stats-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--border-radius);
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .streak-badge {
+      color: var(--accent-yellow);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 5px;
+      background: #141414;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .question-card {
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--border-radius);
+      padding: 16px 14px;
+      margin-bottom: 16px;
+    }
+
+    .question-meta {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: calc(var(--font-scale) * 1.05);
+      font-weight: 700;
+      line-height: 1.35;
+      color: #fff;
+      user-select: text;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .option-btn {
+      width: 100%;
+      min-height: 50px;
+      background: #080808;
+      border: 1.5px solid var(--surface-border);
+      border-radius: var(--border-radius);
+      color: var(--text-main);
+      padding: 12px 14px;
+      font-size: var(--font-size-btn);
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.1s ease, border-color 0.15s ease;
+    }
+
+    .option-btn:active {
+      transform: scale(0.98);
+    }
+
+    .option-letter {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #121212;
+      border: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    /* ESTADOS DE RESPUESTA */
+    .option-btn.correct {
+      background: rgba(0, 255, 136, 0.08) !important;
+      border-color: var(--accent-green) !important;
+      color: #fff !important;
+    }
+    .option-btn.correct .option-letter {
+      background: var(--accent-green);
+      color: #000;
+      border-color: var(--accent-green);
+    }
+
+    .option-btn.wrong {
+      background: rgba(255, 51, 102, 0.08) !important;
+      border-color: var(--accent-red) !important;
+      color: #fff !important;
+    }
+    .option-btn.wrong .option-letter {
+      background: var(--accent-red);
+      color: #fff;
+      border-color: var(--accent-red);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* TARJETA DE FEEDBACK DIDÁCTICO */
+    .feedback-card {
+      display: none;
+      background: #080808;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--border-radius);
+      padding: 14px;
+      margin-bottom: 16px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .feedback-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .feedback-title.correct { color: var(--accent-green); }
+    .feedback-title.wrong { color: var(--accent-red); }
+
+    .feedback-expl {
+      font-size: 0.88rem;
+      color: #d0d0d0;
+      line-height: 1.4;
+      user-select: text;
+    }
+
+    .action-btn {
+      width: 100%;
+      height: 52px;
+      background: var(--accent-cyan);
+      color: #000;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: var(--font-size-btn);
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s;
+    }
+
+    .action-btn:active {
+      transform: scale(0.97);
+    }
+
+    .action-btn.secondary {
+      background: #111;
+      color: #fff;
+      border: 1px solid var(--surface-border);
+      margin-top: 10px;
+    }
+
+    /* PANTALLA RESUMEN DE RESULTADOS */
+    .results-card {
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--border-radius);
+      padding: 24px 16px;
+      text-align: center;
+    }
+
+    .score-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 4px solid var(--accent-green);
+      margin: 0 auto 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-big {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .score-total {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .results-verdict {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .results-stats {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* LISTA DE FALLOS */
+    .mistakes-container {
+      text-align: left;
+      margin: 18px 0;
+    }
+
+    .mistake-item {
+      background: #080808;
+      border: 1px solid #202020;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+    }
+
+    .mistake-item strong {
+      color: var(--accent-red);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* UTILIDADES */
+    .text-center { text-align: center; }
+    .mt-2 { margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       CABECERA FIJA SUPERIOR CON CONTROLES
+       ======================================================================== -->
+  <header class="top-bar">
+    <div class="brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span>OLED 3x3</span>
+      <span class="badge">PRO</span>
+    </div>
+
+    <div class="header-actions">
+      <!-- CONTROL DE TAMAÑO DE FUENTE (--A, -A, A, A+, A++) -->
+      <button id="btnFontSize" class="pill-btn" title="Cambiar tamaño de texto">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19L12 5l8 14M7.5 13h9"/>
+        </svg>
+        <span id="lblFontSize">A</span>
+      </button>
+
+      <!-- BOTÓN DE MODO CONTRASTE EXTREMO -->
+      <button id="btnContrast" class="pill-btn" title="Modo Contraste Extremo">
+        ⚡
+      </button>
+
+      <!-- BOTÓN DE AUDIO (MUTE / UNMUTE) -->
+      <button id="btnAudio" class="pill-btn" title="Sonido">
+        🔊
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       CONTENIDO DE LA APLICACIÓN
+       ======================================================================== -->
+  <main class="app-container">
+
+    <!-- ====================================================================
+         VISTA 1: REPASO 3x3 (ESQUEMA DIDÁCTICO)
+         ==================================================================== -->
+    <section id="viewStudy" class="view-section active">
+      <div class="topic-selector-card">
+        <div class="topic-label">
+          <span>Seleccionar Tema de Estudio</span>
+          <span id="topicCounter">1 de 10</span>
+        </div>
+        <select id="selectStudyTopic" class="topic-dropdown"></select>
+      </div>
+
+      <div id="studyContent">
+        <!-- Renderizado dinámicamente con JavaScript -->
+      </div>
+
+      <button id="btnGoToQuiz" class="action-btn" style="margin-top: 14px;">
+        🎮 Jugar Quiz de este Tema (10 Preguntas)
+      </button>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 2: JUEGO DE PREGUNTAS Y RESPUESTAS (QUIZ)
+         ==================================================================== -->
+    <section id="viewQuiz" class="view-section">
+      <!-- Selector de Modo de Juego -->
+      <div id="quizSetupCard" class="topic-selector-card">
+        <div class="topic-label">Configuración del Juego</div>
+        <select id="selectQuizTopic" class="topic-dropdown" style="margin-bottom: 10px;"></select>
+        
+        <div style="display: flex; gap: 8px;">
+          <button id="btnStartTopicQuiz" class="action-btn" style="height: 44px; font-size: 0.85rem;">
+            🎯 Test del Tema
+          </button>
+          <button id="btnStartRandomQuiz" class="action-btn secondary" style="height: 44px; font-size: 0.85rem; margin-top:0;">
+            🎲 Maratón Aleatorio
+          </button>
+        </div>
+      </div>
+
+      <!-- Área de Juego Activo -->
+      <div id="quizActiveArea" style="display: none;">
+        <div class="quiz-stats-bar">
+          <span id="quizCounter">Pregunta 1/10</span>
+          <div class="streak-badge">
+            <span id="quizStreakText">Racha x1</span> 🔥
+          </div>
+          <span id="quizScoreText">0 pts</span>
+        </div>
+
+        <div class="progress-track">
+          <div id="quizProgressBar" class="progress-fill"></div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-meta" id="questionMetaTag">TEMA 1 • GESTIÓN DE RIESGOS</div>
+          <div class="question-text" id="questionTextContent">Texto de la pregunta...</div>
+        </div>
+
+        <div class="options-grid" id="optionsContainer">
+          <!-- Opciones A, B, C, D inyectadas dinámicamente -->
+        </div>
+
+        <!-- Feedback tras responder -->
+        <div id="feedbackCard" class="feedback-card">
+          <div id="feedbackTitle" class="feedback-title"></div>
+          <div id="feedbackExpl" class="feedback-expl"></div>
+        </div>
+
+        <button id="btnNextQuestion" class="action-btn" style="display: none;">
+          Siguiente Pregunta ➔
+        </button>
+      </div>
+
+      <!-- Área de Resultados Finales -->
+      <div id="quizResultsArea" style="display: none;">
+        <div class="results-card">
+          <div class="score-circle">
+            <span class="score-big" id="resCorrect">0</span>
+            <span class="score-total">de 10 aciertos</span>
+          </div>
+
+          <h2 class="results-verdict" id="resVerdict">¡Completado!</h2>
+          <p class="results-stats" id="resStats">Puntuación: 0 pts | Precisión: 0%</p>
+
+          <div id="mistakesSection" class="mistakes-container" style="display: none;">
+            <p style="font-weight: 700; color: #fff; margin-bottom: 8px;">Preguntas para repasar:</p>
+            <div id="mistakesList"></div>
+            <button id="btnRetryMistakes" class="action-btn secondary" style="margin-bottom: 8px;">
+              🔄 Reintentar solo preguntas falladas
+            </button>
+          </div>
+
+          <button id="btnRestartQuiz" class="action-btn">
+            ▶️ Jugar de Nuevo
+          </button>
+          <button id="btnReturnTo3x3" class="action-btn secondary">
+            📖 Volver a Repasar 3x3
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 3: LOGROS Y ESTADÍSTICAS
+         ==================================================================== -->
+    <section id="viewStats" class="view-section">
+      <div class="block-card">
+        <div class="block-header">
+          <span class="block-title">📊 Estadísticas Globales</span>
+        </div>
+        <div class="concept-item">
+          <div class="concept-dot"></div>
+          <div class="concept-content">
+            <strong>Partidas Jugadas</strong>
+            <span id="statGamesPlayed">0</span>
+          </div>
+        </div>
+        <div class="concept-item">
+          <div class="concept-dot"></div>
+          <div class="concept-content">
+            <strong>Aciertos Totales</strong>
+            <span id="statTotalCorrect">0</span>
+          </div>
+        </div>
+        <div class="concept-item">
+          <div class="concept-dot"></div>
+          <div class="concept-content">
+            <strong>Mejor Racha de Aciertos</strong>
+            <span id="statBestStreak">0 seguidas</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="block-card">
+        <div class="block-header">
+          <span class="block-title">🏆 Medallas Desbloqueables</span>
+        </div>
+        <div id="achievementsList">
+          <!-- Renderizado dinámicamente -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       BARRA INFERIOR DE NAVEGACIÓN (PULGAR FRIENDLY)
+       ======================================================================== -->
+  <nav class="bottom-nav">
+    <button class="nav-tab active" data-view="viewStudy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      </svg>
+      Repaso 3x3
+    </button>
+    <button class="nav-tab" data-view="viewQuiz">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      Juego Quiz
+    </button>
+    <button class="nav-tab" data-view="viewStats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="8" r="7"/>
+        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+      </svg>
+      Logros
+    </button>
+  </nav>
+
+  <!-- ========================================================================
+       MOTOR JAVASCRIPT: CONTENIDO + SONIDO NATIVO + LÓGICA DE JUEGO
+       ======================================================================== -->
+  <script>
+    /* ==========================================================================
+       1. BASE DE DATOS COMPLETA: 10 TEMAS (3x3) Y 10 PREGUNTAS POR TEMA (100 TOTAL)
+       ========================================================================== */
+    const TOPICS_DATA = [
+      {
+        id: 1,
+        title: "Tema 1: Introducción y Gestión de Riesgos",
+        blocks: [
+          {
+            title: "1. Flujo de seguridad y evaluación",
+            concepts: [
+              { term: "Flujo troncal", desc: "Amenaza ➔ Explota Vulnerabilidad ➔ Afecta Activo ➔ Provoca Impacto." },
+              { term: "Componentes del riesgo", desc: "Estimación basada en probabilidad e impacto; delimitación entre riesgo inherente y riesgo residual." },
+              { term: "Marco documental", desc: "Jerarquía de gobernanza formada por política, estándar, línea base (baseline) y procedimiento." }
+            ]
+          },
+          {
+            title: "2. Taxonomía y perfilado de atacantes",
+            concepts: [
+              { term: "Criterios de clasificación", desc: "Frecuencia e impacto según el ENISA Threat Landscape (ETL)." },
+              { term: "Escala de sofisticación", desc: "Progresión de atacantes desde oportunistas/hacktivistas hasta cibercrimen organizado, APT y actores patrocinados por Estados." },
+              { term: "Estrategia defensiva", desc: "Prevenir, detectar y responder ante amenazas comunes; detección y respuesta inmediata ante APT y Estados." }
+            ]
+          },
+          {
+            title: "3. Ciberinteligencia e intercambio",
+            concepts: [
+              { term: "Niveles de Threat Intelligence", desc: "Estratégica (directiva), operativa/técnica (campañas y malware) y táctica (reglas e IoC)." },
+              { term: "Atributos de inteligencia útil", desc: "Oportuna, precisa, procesable y relevante." },
+              { term: "Estandarización de intercambio", desc: "Protocolos automatizados máquina a máquina (STIX/TAXII y plataforma CCN-LUCIA) y ciclo de 5 fases (agregación, enriquecimiento, filtrado, categorización y entrega)." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "Indica cuáles de las siguientes afirmaciones son correctas sobre los programas de gestión:",
+            options: [
+              "Los programas de gestión de la seguridad incluyen la gestión del riesgo.",
+              "La gestión del riesgo incluye el desarrollo de programas de seguridad para las áreas con debilidades.",
+              "Los programas de gestión de la seguridad se deben evaluar periódicamente.",
+              "Todas las anteriores."
+            ],
+            correct: 3,
+            expl: "Todas las opciones son correctas: la gestión de la seguridad engloba al riesgo, aborda debilidades y se audita periódicamente."
+          },
+          {
+            q: "Indica cuáles de las siguientes afirmaciones son correctas en la gestión de riesgos:",
+            options: [
+              "Se deben priorizar solo las vulnerabilidades con mayor impacto económico.",
+              "Todos los riesgos deben llevar obligatoriamente a la implantación de controles.",
+              "La fuente de la amenaza en la gestión de riesgos es cada vulnerabilidad.",
+              "Ninguna de las anteriores."
+            ],
+            correct: 3,
+            expl: "Ninguna es correcta: el riesgo puede aceptarse o transferirse (no siempre mitigarse), y la fuente es la amenaza exterior, no la vulnerabilidad."
+          },
+          {
+            q: "¿Cuál de las siguientes opciones define mejor una vulnerabilidad?",
+            options: [
+              "Un recurso valioso para la organización que debe ser protegido.",
+              "Cualquier circunstancia desfavorable que causa consecuencias negativas.",
+              "Un fallo de programación, configuración o diseño que permite alterar el comportamiento normal de un programa.",
+              "La posibilidad de ocurrencia de una amenaza."
+            ],
+            correct: 2,
+            expl: "Una vulnerabilidad es una debilidad o fallo de diseño, configuración o implementación aprovechable por un exploit."
+          },
+          {
+            q: "¿Qué es un activo en el contexto de la gestión de riesgos?",
+            options: [
+              "Un fallo de programación explotable.",
+              "Un recurso de la organización necesario para el desempeño de la actividad y cuya pérdida supone un agravio o coste.",
+              "La probabilidad de que una amenaza se materialice.",
+              "Cualquier circunstancia hostil exterior."
+            ],
+            correct: 1,
+            expl: "Los activos son bienes, derechos o recursos de información cuyo deterioro perjudica directamente a la entidad."
+          },
+          {
+            q: "¿Qué se entiende por riesgo en la gestión de ciberseguridad?",
+            options: [
+              "La evaluación aislada del impacto negativo sobre un activo.",
+              "Un fallo en la implementación del diseño de software.",
+              "Una estimación de la probabilidad de que se materialice una amenaza y su posible impacto.",
+              "El proceso de erradicar todas las vulnerabilidades."
+            ],
+            correct: 2,
+            expl: "El riesgo es la combinación matemática entre la probabilidad de que la amenaza ocurra y la gravedad del impacto resultante."
+          },
+          {
+            q: "¿Cuál categoría involucra el uso de código malicioso como virus, gusanos o troyanos?",
+            options: [
+              "Ataques de denegación de servicio (DoS).",
+              "Accesos no autorizados.",
+              "Infecciones por malware.",
+              "Uso indebido de recursos."
+            ],
+            correct: 2,
+            expl: "El malware agrupa toda clase de software malintencionado diseñado para infectar o dañar sistemas."
+          },
+          {
+            q: "¿Qué factor considera la criticidad y sensibilidad de los sistemas comprometidos?",
+            options: [
+              "Procedencia de la amenaza.",
+              "Nivel de seguridad de los sistemas afectados.",
+              "Perfil de los usuarios afectados.",
+              "Consecuencias."
+            ],
+            correct: 1,
+            expl: "El nivel de seguridad de los sistemas analiza la criticidad, aislamiento y nivel de exposición del activo atacado."
+          },
+          {
+            q: "¿Cuál se clasifica formalmente como 'contenido abusivo' en la taxonomía de incidentes?",
+            options: [
+              "Spam.",
+              "Denegación de servicio (DoS).",
+              "Ingeniería social.",
+              "Explotación de vulnerabilidades."
+            ],
+            correct: 0,
+            expl: "En las taxonomías estándar (ENS y CSIRTs), el Spam se cataloga bajo el epígrafe de contenido abusivo."
+          },
+          {
+            q: "Indica cuál de las siguientes afirmaciones es cierta respecto a los controles de seguridad:",
+            options: [
+              "Siempre es más importante reducir la probabilidad que el impacto.",
+              "La probabilidad de un ataque solo depende del dinero del atacante.",
+              "El coste de implantar una medida no estará justificado si no está vinculada a reducir un riesgo asociado.",
+              "Ninguna de las anteriores."
+            ],
+            correct: 2,
+            expl: "Principio de proporcionalidad: las salvaguardas deben ser económicamente viables y mitigar un riesgo concreto."
+          },
+          {
+            q: "¿Qué beneficio primordial proporciona el intercambio de ciberinteligencia entre organizaciones?",
+            options: [
+              "Aumenta la sobrecarga manual de análisis en solitario.",
+              "Permite una defensa más efectiva al compartir patrones de ataque conocidos colectivamente.",
+              "Dificulta el hallazgo de amenazas internas.",
+              "Elimina por completo la necesidad de cortafuegos."
+            ],
+            correct: 1,
+            expl: "Compartir inteligencia (IoCs/TTPs) permite neutralizar campañas adversarias antes de que impacten a otros miembros."
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Tema 2: La Internet Oscura",
+        blocks: [
+          {
+            title: "1. Segmentación del ciberespacio",
+            concepts: [
+              { term: "Surface Web", desc: "Contenido público indexado por motores de búsqueda convencionales." },
+              { term: "Deep Web", desc: "Información no indexada de acceso legítimo protegida tras autenticación (bases de datos, intranets, correos)." },
+              { term: "Dark Web", desc: "Redes superpuestas (overlays) intencionadamente ocultas que requieren herramientas especializadas para su acceso." }
+            ]
+          },
+          {
+            title: "2. Redes distribuidas P2P",
+            concepts: [
+              { term: "ZeroNet", desc: "Arquitectura P2P en Python basada en BitTorrent y criptografía Bitcoin; contenido alojado en sembradores (seeders)." },
+              { term: "I2P", desc: "Enrutamiento de ajo (garlic routing) de cuatro capas, comunicación completamente interna y catálogo distribuido mediante DHT." },
+              { term: "Freenet", desc: "Red descentralizada orientada a la resistencia a la censura con almacenamiento de fragmentos cifrados ajenos." }
+            ]
+          },
+          {
+            title: "3. Usos y vectores de riesgo",
+            concepts: [
+              { term: "Propósitos legítimos", desc: "Preservación de la privacidad, elusión de censura y libertad de expresión." },
+              { term: "Explotación ilícita", desc: "Mercados clandestinos, distribución de malware y foros de cibercrimen." },
+              { term: "Riesgo operativo y legal", desc: "Retos de trazabilidad y riesgos derivados del almacenamiento distribuido involuntario." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "¿Cuál es la principal diferencia entre la Deep Web y la Dark Web?",
+            options: [
+              "La Deep Web es ilegal, mientras que la Dark Web es legal.",
+              "La Dark Web es una parte específica y más oculta de la Deep Web.",
+              "La Deep Web no requiere credenciales y la Dark Web sí.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "La Dark Web es una subsección intencionadamente oculta dentro de la Deep Web que exige software overlay como Tor o I2P."
+          },
+          {
+            q: "¿Qué tipo de contenido compone fundamentalmente la Deep Web?",
+            options: [
+              "Exclusivamente cibercrimen y foros ilícitos.",
+              "Páginas indexadas en Google.",
+              "Bases de datos, archivos académicos y correos tras autenticación.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "La inmensa mayoría de la Deep Web es información legítima pero no indexada por motores convencionales."
+          },
+          {
+            q: "¿Qué es Tor y cuál es su objetivo principal?",
+            options: [
+              "Una red para descargar torrents comerciales.",
+              "Un software diseñado por cibercriminales para extorsión.",
+              "Una red anónima para preservar la privacidad y el anonimato online.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "Tor busca proteger la libertad de navegación y el anonimato mediante cifrado y reenvío multicapa."
+          },
+          {
+            q: "¿Qué es ZeroNet y en qué se diferencia de Tor?",
+            options: [
+              "Una red centralizada en servidores de la CIA.",
+              "Una red P2P que utiliza criptografía bitcoin y BitTorrent.",
+              "Un navegador ordinario para la Surface Web.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "ZeroNet se basa en sembradores (seeders) P2P con direcciones basadas en criptografía de Bitcoin."
+          },
+          {
+            q: "¿Cuál es la principal vulnerabilidad de I2P citada en los apuntes?",
+            options: [
+              "Incapacidad de usar criptografía.",
+              "Ataque Sybil que afecta la reputación e influencia en la red P2P.",
+              "Obligatoriedad de registrar el DNI.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "I2P es susceptible a ataques Sybil, donde una entidad crea multitud de identidades falsas para influir en la topología."
+          },
+          {
+            q: "¿Qué son los freesites en la red Freenet?",
+            options: [
+              "Páginas web estándar alojadas en servidores Apache comunes.",
+              "Contenido y sitios compartidos de forma anónima dentro de Freenet.",
+              "Sitios web censurados por la policía judicial.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "Los freesites son las webs internas distribuidas y cifradas en fragmentos entre los nodos de Freenet."
+          },
+          {
+            q: "¿Cuál es la principal desventaja de Tor en rendimiento?",
+            options: [
+              "Exceso de velocidad sin control.",
+              "Conexión lenta debido al enrutamiento sucesivo por múltiples nodos.",
+              "Consumo de saldo telefónico.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "El paso por tres nodos (Guard, Middle, Exit) y los múltiples saltos cifrados generan latencia añadida."
+          },
+          {
+            q: "¿Cómo funciona el enrutamiento cebolla (Onion Routing) en Tor?",
+            options: [
+              "Añade una capa de cifrado en cada nodo intermedio al pasar.",
+              "Utiliza enrutamiento de ajo de cuatro capas como I2P.",
+              "Requiere autenticación con usuario y clave.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 3,
+            expl: "Ninguna es correcta: el emisor cifra todas las capas por anticipado y cada nodo 'pela'/descifra una capa (no añade)."
+          },
+          {
+            q: "¿Cómo se accede habitualmente a la Dark Web?",
+            options: [
+              "Mediante Google Chrome directamente sin configuración.",
+              "Utilizando redes overlay y navegadores dedicados como Tor Browser.",
+              "A través de un buscador web convencional.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "Requiere clientes capaces de resolver nombres especiales (.onion, .i2p) y enrutar por redes superpuestas."
+          },
+          {
+            q: "¿Qué significa el acrónimo I2P?",
+            options: [
+              "Internet to Peer.",
+              "The Invisible Internet Project, proporcionando anonimato bidireccional.",
+              "Integrated 2-Phase Protocol.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "I2P son las siglas de 'The Invisible Internet Project', una red interna anónima y descentralizada."
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Tema 3: Tor",
+        blocks: [
+          {
+            title: "1. Arquitectura y directorio",
+            concepts: [
+              { term: "Modelo de red", desc: "Funcionamiento descentralizado en el tráfico pero centralizado en su directorio." },
+              { term: "Autoridades de directorio", desc: "Servidores fijos preconfigurados (10 autoridades) que mantienen el registro oficial del estado y presencia de los nodos." },
+              { term: "Servicios ocultos", desc: "Dominios con sufijo .onion calculados mediante claves criptográficas sin resolución DNS estándar." }
+            ]
+          },
+          {
+            title: "2. Topología de nodos (relays)",
+            concepts: [
+              { term: "Nodo de entrada (Guard relay)", desc: "Recibe la conexión inicial del cliente conociendo su dirección IP real." },
+              { term: "Nodo intermedio (Middle relay)", desc: "Reenvía el tráfico entre el nodo de entrada y el de salida sin conocer origen ni destino." },
+              { term: "Nodo de salida (Exit) y puentes (Bridges)", desc: "El nodo de salida entrega el tráfico descifrado a Internet; los puentes son nodos ocultos no catalogados para evadir censura." }
+            ]
+          },
+          {
+            title: "3. Enrutamiento cebolla (Onion Routing)",
+            concepts: [
+              { term: "Cifrado multicapa", desc: "Cifrado sucesivo por capas con las claves públicas de cada salto, descifrando solo una capa en cada tramo." },
+              { term: "Aislamiento de trayecto", desc: "Cada nodo únicamente conoce al participante inmediatamente anterior y al posterior." },
+              { term: "Compromiso de rendimiento", desc: "Elevado grado de anonimato frente a mayor latencia por saltos sucesivos." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "¿Cuál es el objetivo principal del proyecto Tor?",
+            options: [
+              "Centralizar todo el tráfico global de Internet.",
+              "Proporcionar un acceso seguro y anónimo a la red y a la Dark Web.",
+              "Indexar todas las páginas existentes.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "Tor garantiza que las comunicaciones no puedan ser interceptadas ni rastreadas fácilmente hasta el emisor original."
+          },
+          {
+            q: "¿Cómo se llama al proceso de cifrado en capas utilizado por Tor?",
+            options: [
+              "Cifrado de capas múltiples simétrico.",
+              "Encriptación de extremo a extremo rígida.",
+              "Enrutamiento en capas (Onion Routing).",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "Onion Routing es la denominación técnica del enrutamiento cebolla en capas que da nombre al proyecto."
+          },
+          {
+            q: "¿Cuál es la función de las autoridades de directorio en Tor?",
+            options: [
+              "Almacenar el historial de descargas de cada usuario.",
+              "Bloquear páginas web con opiniones contrarias.",
+              "Proporcionar al cliente rutas aleatorias y el estado fidedigno de los nodos.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "Son los servidores de confianza encargados de listar los nodos operativos y entregar circuitos aleatorios."
+          },
+          {
+            q: "¿Qué tipo de red es Tor en términos de su administración de directorio?",
+            options: [
+              "Red centralizada (en su directorio de nodos).",
+              "Red 100% descentralizada sin ningún servidor fijo.",
+              "Red de malla no direccionada.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 0,
+            expl: "Aunque el enrutamiento del tráfico es distribuido, su directorio se basa en una autoridad centralizada de servidores preconfigurados."
+          },
+          {
+            q: "¿Qué función primordial cumplen los nodos de salida (Exit relays)?",
+            options: [
+              "Conectar directamente con la dirección IP del usuario.",
+              "Cifrar el mensaje antes de que salga del cliente.",
+              "Salir a la red exterior de Internet visible y entregar la petición descifrada.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "El exit relay descifra la última capa y contacta con el servidor web final en el Internet convencional."
+          },
+          {
+            q: "¿Qué significa que la red Tor utilice un enrutamiento en capas?",
+            options: [
+              "Que los cables de red física están apilados.",
+              "Que los ordenadores pertenecen a distintas empresas.",
+              "Que los paquetes de datos viajan envueltos en sucesivas capas de cifrado.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "El paquete se cifra tantas veces como nodos tenga el circuito; cada nodo solo retira la suya."
+          },
+          {
+            q: "¿Qué reflejan las métricas públicas de la página del proyecto Tor?",
+            options: [
+              "El saldo bancario de los creadores.",
+              "El crecimiento constante y la actividad de la red de nodos y servicios.",
+              "La identidad de los usuarios que navegan.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "Demuestran la evolución, número de repetidores (relays) y ancho de banda agregado disponible."
+          },
+          {
+            q: "¿Qué define a una red de administración centralizada frente a P2P?",
+            options: [
+              "Que obliga al pago con criptomonedas.",
+              "Que no permite la conexión de clientes.",
+              "Que administra tareas de registro y directorio desde puntos centrales.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "En las arquitecturas centralizadas, el catálogo de componentes está supervisado por servidores de referencia fijos."
+          },
+          {
+            q: "¿Cómo se define conceptualmente la Deep Web?",
+            options: [
+              "La parte no indexable por buscadores convencionales como Google.",
+              "Una red ilegal que solo funciona con virus.",
+              "El conjunto de software malicioso mundial.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 0,
+            expl: "Es el contenido web que los crawlers e indexadores públicos no pueden rastrear."
+          },
+          {
+            q: "¿Cuál es el cometido principal de los nodos puente (Bridges) en Tor?",
+            options: [
+              "Evitar el bloqueo de censura de gobiernos que vetan las IPs públicas de entrada.",
+              "Cobrar comisiones por paquete transmitido.",
+              "Actuar como servidores web convencionales.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 0,
+            expl: "Los Bridges no están listados en el directorio público y sirven para saltar filtros y cortafuegos estatales."
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "Tema 4: Criptomonedas",
+        blocks: [
+          {
+            title: "1. Fundamentos de la tecnología Blockchain",
+            concepts: [
+              { term: "Registro distribuido (DLT)", desc: "Base de datos descentralizada, transparente y sin intermediarios." },
+              { term: "Inmutabilidad y hashes", desc: "Bloques enlazados criptográficamente mediante funciones hash para evitar alteraciones." },
+              { term: "Árbol y raíz de Merkle", desc: "Estructura de consolidación y verificación rápida de integridad para transacciones agrupadas." }
+            ]
+          },
+          {
+            title: "2. Mecanismos y componentes operativos",
+            concepts: [
+              { term: "Consenso y minería", desc: "Validación distribuida mediante resolución de acertijos matemáticos y recompensas de bloque." },
+              { term: "Ecosistema de monedas", desc: "Bitcoin como referencia y surgimiento de redes alternativas (altcoins: Ethereum, Dogecoin)." },
+              { term: "Métodos de adquisición", desc: "Minería, plataformas de intercambio (exchanges) y cajeros automáticos dedicados." }
+            ]
+          },
+          {
+            title: "3. Seguridad y regulación",
+            concepts: [
+              { term: "Vectores de ataque", desc: "Malware enfocado en billeteras, sitios fraudulentos y correos de suplantación." },
+              { term: "Uso en el cibercrimen", desc: "Medio preferente para transacciones ilícitas y pagos de rescates por ransomware." },
+              { term: "Marcos regulatorios", desc: "Consideración de bien patrimonial en España (sujeto a permuta comercial e IRPF) frente a la prohibición en China." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "¿Qué característica de la blockchain la hace inalterable e imposible de falsificar?",
+            options: [
+              "El uso de bases de datos relacionales SQL.",
+              "Su diseño en cadenas de bloques donde cada bloque incluye el hash del anterior.",
+              "Estar alojada en un único servidor de máxima seguridad.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "La dependencia criptográfica encadenada hace que modificar un bloque invalide todos los posteriores."
+          },
+          {
+            q: "¿Cuándo se minó el primer bloque de Bitcoin (Bloque Génesis)?",
+            options: [
+              "En el año 2008.",
+              "En el año 2010.",
+              "El 3 de enero de 2009.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "Satoshi Nakamoto minó el bloque 0 el 3 de enero de 2009, incluyendo el titular de The Times."
+          },
+          {
+            q: "¿Qué aplicación de 2004 ideada por Hal Finney es un antecedente clave de las criptomonedas?",
+            options: [
+              "Ethereum Smart Contracts.",
+              "Hyperledger Fabric.",
+              "Reusable Proof of Work (RPoW).",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "RPoW (Prueba de Trabajo Reutilizable) sentó los cimientos del mecanismo de minería de Bitcoin."
+          },
+          {
+            q: "¿Cuál es la función propia de los nodos en la red blockchain?",
+            options: [
+              "Calcular en solitario las soluciones criptográficas.",
+              "Fijar el precio comercial del activo en bolsa.",
+              "Crear monedas de curso legal.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 3,
+            expl: "Ninguna es correcta: los nodos validan y replican la cadena completa actualizada en tiempo real (los mineros resuelven la PoW)."
+          },
+          {
+            q: "¿Cómo se garantiza la autenticidad e integridad de un bloque en blockchain?",
+            options: [
+              "Mediante la firma de un notario público colegiado.",
+              "Gracias a la función hash calculada para el bloque.",
+              "A través de un antivirus corporativo.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 1,
+            expl: "El hash actúa como una huella digital matemática única e inmodificable del contenido del bloque."
+          },
+          {
+            q: "¿Cuál de los siguientes datos NO forma parte del bloque de blockchain?",
+            options: [
+              "Tamaño de bloque.",
+              "Hash del bloque anterior.",
+              "Dirección IP física del minero.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "La dirección IP no se incrusta en el encabezado del bloque; se almacenan hashes, timestamps, nonce y transacciones."
+          },
+          {
+            q: "¿Cuál es la función del árbol y la raíz de Merkle (Merkle Root)?",
+            options: [
+              "Combinar todas las transacciones del bloque en un único hash representativo.",
+              "Identificar el nombre real del minero.",
+              "Registrar la cotización en dólares del bitcoin.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 0,
+            expl: "El árbol de Merkle resume eficientemente miles de transacciones en un solo hash de 32 bytes en la cabecera."
+          },
+          {
+            q: "¿Qué elemento numérico indica la cantidad de operaciones registradas en un bloque?",
+            options: [
+              "Marca de tiempo (Timestamp).",
+              "Tamaño de bloque.",
+              "Contador de transacciones.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "El contador de transacciones especifica cuántas transferencias contiene dicho bloque."
+          },
+          {
+            q: "¿Qué representa el campo 'tamaño de bloque' en la estructura técnica?",
+            options: [
+              "El peso de cada transacción respecto al total.",
+              "La posición ordinal del bloque en la blockchain.",
+              "El porcentaje de comisión del minero.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 3,
+            expl: "Ninguna es correcta: es simplemente el número entero en bytes que ocupa el bloque completo."
+          },
+          {
+            q: "¿Cuál es el cometido del 'número mágico' (Magic Number) en Bitcoin?",
+            options: [
+              "Revelar la contraseña secreta de la billetera.",
+              "Garantizar el pago de impuestos.",
+              "Identificar la red blockchain correspondiente (ej. mainnet: 0xD9B4BEF9).",
+              "Ninguna opción es correcta."
+            ],
+            correct: 2,
+            expl: "Es un identificador constante que distingue el protocolo y la red en la transmisión de paquetes."
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "Tema 5: Inteligencia en Fuentes Abiertas (OSINT)",
+        blocks: [
+          {
+            title: "1. Fundamentos y disciplinas",
+            concepts: [
+              { term: "Concepto de OSINT", desc: "Obtención legal y ética de datos públicos para generar inteligencia procesable." },
+              { term: "Disciplinas complementarias", desc: "Integración con SIGINT (señales), GEOINT (geoespacial), HUMINT (humana) y SOCMINT (redes sociales)." },
+              { term: "Huella digital", desc: "Rastro de metadatos, registros e información corporativa o personal expuesta en Internet." }
+            ]
+          },
+          {
+            title: "2. El ciclo de inteligencia",
+            concepts: [
+              { term: "Fases iniciales", desc: "Planificación/Requisitos ➔ Descubrimiento de Fuentes ➔ Adquisición de datos." },
+              { term: "Fases finales", desc: "Procesamiento técnico ➔ Análisis (depuración, validación y descarte) ➔ Producción de Inteligencia." },
+              { term: "Retos analíticos", desc: "Filtrado frente a sobreabundancia de datos (infoxicación) y control de desinformación/sesgos." }
+            ]
+          },
+          {
+            title: "3. Técnicas y reconocimiento pasivo",
+            concepts: [
+              { term: "Dorks (Google Hacking)", desc: "Uso de operadores específicos (site:, filetype:, inurl:, intitle:, cache:)." },
+              { term: "Bases de vulnerabilidades", desc: "Registro Google Hacking Database (GHDB en Exploit-DB) y recolección automatizada." },
+              { term: "Exposición y presencia", desc: "Fugas en archivos robots.txt y verificación de usuarios en redes con herramientas como Namechk." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "¿Cómo se define de forma precisa la disciplina OSINT?",
+            options: [
+              "El hackeo ilegal de servidores gubernamentales.",
+              "La obtención legal y ética de datos públicos para generar inteligencia procesable.",
+              "La compra de bases de datos filtradas en la Dark Web.",
+              "La interceptación de llamadas telefónicas privadas."
+            ],
+            correct: 1,
+            expl: "OSINT se fundamenta en recopilar y analizar información de fuentes públicas y abiertas con métodos éticos y legales."
+          },
+          {
+            q: "¿Qué disciplina de inteligencia se enfoca en la investigación de redes sociales?",
+            options: ["GEOINT", "SIGINT", "SOCMINT", "MASINT"],
+            correct: 2,
+            expl: "SOCMINT (Social Media Intelligence) investiga interacciones, perfiles y datos en redes sociales."
+          },
+          {
+            q: "¿Cuál es el principal peligro analítico en las fases de adquisición de OSINT?",
+            options: [
+              "Falta absoluta de documentos en la web.",
+              "Infoxicación (sobreabundancia de datos) y sesgos cognitivos.",
+              "La necesidad obligatoria de contar con una orden judicial.",
+              "El apagón de la red eléctrica."
+            ],
+            correct: 1,
+            expl: "La infoxicación exige rigurosas fases de filtrado, verificación y contraste de fiabilidad."
+          },
+          {
+            q: "¿Qué operador de Google Dork filtra resultados por tipo de archivo específico?",
+            options: ["site:", "inurl:", "filetype:", "intitle:"],
+            correct: 2,
+            expl: "El operador filetype: (ej. filetype:pdf) restringe la búsqueda a extensiones concretas."
+          },
+          {
+            q: "¿Qué repositorio público recopila dorks avanzados categorizados para auditorías?",
+            options: [
+              "Google Hacking Database (GHDB) en Exploit-DB.",
+              "GitHub Tor Directory.",
+              "The Pirate Bay Index.",
+              "NIST Root Zone."
+            ],
+            correct: 0,
+            expl: "GHDB contiene miles de consultas de búsqueda avanzadas para detectar fallos de configuración."
+          },
+          {
+            q: "¿Qué archivo de un servidor web suele revelar inadvertidamente rutas sensibles a los analistas?",
+            options: ["index.html", "robots.txt", "style.css", "favicon.ico"],
+            correct: 1,
+            expl: "robots.txt indica a los buscadores qué directorios no indexar, desvelando a menudo paneles privados."
+          },
+          {
+            q: "¿Qué herramienta es popular para comprobar la disponibilidad de un alias en decenas de redes sociales?",
+            options: ["Nmap", "Wireshark", "Namechk / CheckUsernames", "Metasploit"],
+            correct: 2,
+            expl: "Namechk permite rastrear la presencia digital y el perfilado de seudónimos en múltiples plataformas."
+          },
+          {
+            q: "¿Cuál de las siguientes es una fase del ciclo de inteligencia?",
+            options: [
+              "Planificación y definición de requisitos.",
+              "Venta de exploits de día cero.",
+              "Instalación de malware en el objetivo.",
+              "Cifrado de discos duros."
+            ],
+            correct: 0,
+            expl: "El ciclo comienza formalmente con la planificación y especificación clara de objetivos y requisitos."
+          },
+          {
+            q: "¿A qué disciplina corresponde el análisis de imágenes satelitales y cartográficas?",
+            options: ["HUMINT", "GEOINT", "TECHINT", "COMINT"],
+            correct: 1,
+            expl: "GEOINT (Geospatial Intelligence) analiza datos visuales, satelitales y geográficos."
+          },
+          {
+            q: "¿Por qué el análisis es la fase crítica del ciclo de inteligencia?",
+            options: [
+              "Porque transforma datos brutos dispersos en conocimiento estratégico procesable.",
+              "Porque destruye las pruebas obtenidas.",
+              "Porque reduce la velocidad de conexión.",
+              "Porque requiere autorización bancaria."
+            ],
+            correct: 0,
+            expl: "El análisis riguroso distingue a la ciberinteligencia de la simple acumulación pasiva de datos."
+          }
+        ]
+      },
+      {
+        id: 6,
+        title: "Tema 6: Ataques a IoT (Internet de las Cosas)",
+        blocks: [
+          {
+            title: "1. Superficie de ataque en IoT",
+            concepts: [
+              { term: "Proliferación del hardware", desc: "Crecimiento masivo desde dispositivos domésticos hasta entornos logísticos e industriales." },
+              { term: "Entornos SCADA e ICS", desc: "Exposición crítica de sistemas de supervisión y control industrial a redes abiertas." },
+              { term: "Debilidades estructurales", desc: "Falta de soporte de actualizaciones, protocolos inseguros y configuraciones por defecto." }
+            ]
+          },
+          {
+            title: "2. Autenticación y vulnerabilidades",
+            concepts: [
+              { term: "Mecanismos de autenticación", desc: "Empleo de credenciales predeterminadas débiles o ausencia de validación robusta." },
+              { term: "Análisis de vulnerabilidades", desc: "Identificación de puertos abiertos, servicios desactualizados y fallos de firmware." },
+              { term: "Hacking ético y fingerprinting", desc: "Obtención de cabeceras, servicios y versiones de sistemas embebidos mediante técnicas de huella digital." }
+            ]
+          },
+          {
+            title: "3. Herramientas de descubrimiento de activos",
+            concepts: [
+              { term: "Shodan", desc: "Motor de búsqueda para localizar servidores, cámaras y dispositivos conectados mediante escaneo de puertos." },
+              { term: "Censys", desc: "Plataforma de descubrimiento de infraestructura expuesta y validación de certificados SSL/TLS." },
+              { term: "Motores complementarios", desc: "ZoomEye, BinaryEdge y Mr Looquer para identificación de servicios y vectores de exposición." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "¿Cuál es el motor de búsqueda más conocido para descubrir dispositivos IoT conectados a Internet?",
+            options: ["Google Search", "Shodan", "DuckDuckGo", "Yahoo"],
+            correct: 1,
+            expl: "Shodan rastrea y categoriza continuamente puertos abiertos, banners de servicios y dispositivos conectados."
+          },
+          {
+            q: "¿Qué debilidad estructural predomina en dispositivos IoT domésticos y de consumo?",
+            options: [
+              "Cifrado cuántico indescifrable.",
+              "Credenciales por defecto (admin/admin) y ausencia de parches de firmware periódicos.",
+              "Exceso de memoria RAM disponible.",
+              "Ausencia de conexión a la red."
+            ],
+            correct: 1,
+            expl: "El empleo de claves predefinidas y la falta de ciclo de vida de soporte de parches son sus fallos más graves."
+          },
+          {
+            q: "¿Qué significan las siglas SCADA en entornos de infraestructuras críticas?",
+            options: [
+              "Security Control and Data Automation.",
+              "Supervisory Control and Data Acquisition.",
+              "Simple Communication Application for Data Access.",
+              "Server Centralized Advanced Defense Array."
+            ],
+            correct: 1,
+            expl: "SCADA supervisa y controla procesos industriales vitales (agua, electricidad, transporte)."
+          },
+          {
+            q: "¿Qué plataforma alternativa a Shodan analiza certificados SSL y puertos expuestos?",
+            options: ["Censys", "Steam", "Photoshop", "BitTorrent"],
+            correct: 0,
+            expl: "Censys permite auditar infraestructura expuesta analizando certificados y respuestas de red."
+          },
+          {
+            q: "¿Cómo se llama la técnica de identificar sistemas operativos y servicios mediante sus cabeceras?",
+            options: ["Phishing", "Fingerprinting (o banner grabbing)", "Ransomware", "Cross-site scripting"],
+            correct: 1,
+            expl: "El fingerprinting determina versiones exactas de firmware y software leyendo las respuestas del servidor."
+          },
+          {
+            q: "¿Por qué los dispositivos IoT son comúnmente reclutados en botnets masivas (como Mirai)?",
+            options: [
+              "Porque tienen firewalls corporativos de última generación.",
+              "Por su gran número, conectividad permanente y débil autenticación predeterminada.",
+              "Porque ejecutan Windows 11 por defecto.",
+              "Porque no transmiten paquetes TCP/IP."
+            ],
+            correct: 1,
+            expl: "La falta de mantenimiento y su conexión 24/7 los convierte en vectores ideales para ataques DDoS."
+          },
+          {
+            q: "¿Qué motor de descubrimiento complementario tiene origen asiático?",
+            options: ["ZoomEye", "WordPerfect", "Internet Explorer", "Docker"],
+            correct: 0,
+            expl: "ZoomEye es un conocido motor de búsqueda de ciberespacio enfocado en dispositivos y componentes web."
+          },
+          {
+            q: "¿Qué protocolo industrial clásico suele carecer de cifrado y autenticación nativa?",
+            options: ["HTTPS", "Modbus", "SSH", "TLS 1.3"],
+            correct: 1,
+            expl: "Modbus fue concebido para redes aisladas y carece de autenticación robusta al exponerse en Internet."
+          },
+          {
+            q: "¿Qué riesgo grave implica la exposición de sistemas ICS a Internet sin aislamiento?",
+            options: [
+              "Pérdida de puntos en redes sociales.",
+              "Sabotaje físico directo de infraestructuras energéticas o fabriles.",
+              "Mayor velocidad de descarga de vídeos.",
+              "Consumo de tinta de impresora."
+            ],
+            correct: 1,
+            expl: "Un ciberataque a sistemas industriales puede provocar daños materiales y riesgos para vidas humanas."
+          },
+          {
+            q: "¿Qué medida preventiva es prioritaria al instalar cualquier dispositivo IoT?",
+            options: [
+              "Modificar de inmediato las credenciales por defecto y actualizar su firmware.",
+              "Dejar el puerto Telnet abierto para soporte remoto.",
+              "Desactivar las contraseñas para facilitar el acceso.",
+              "Conectarlo a la red de producción sin VLAN."
+            ],
+            correct: 0,
+            expl: "Cambiar contraseñas iniciales y aislar el dispositivo en redes segmentadas son las mejores prácticas esenciales."
+          }
+        ]
+      },
+      {
+        id: 7,
+        title: "Tema 7: Fraudes en la Red",
+        blocks: [
+          {
+            title: "1. Ingeniería social y manipulación económica",
+            concepts: [
+              { term: "Vectores codicia/premio", desc: "Cartas nigerianas (anticipo por herencias) y falsos premios de lotería." },
+              { term: "Fraude en comercio online", desc: "Estafas en transacciones de compraventa (vehículos a bajo precio con depósitos previos)." },
+              { term: "Urgencias ficticias", desc: "Reclamación fraudulenta de dinero por falsos accidentes o emergencias médicas en el extranjero." }
+            ]
+          },
+          {
+            title: "2. Estafas afectivas y extorsión",
+            concepts: [
+              { term: "Romance scam", desc: "Creación de perfiles falsos que fingen relaciones afectivas para manipular y sustraer fondos." },
+              { term: "Sextorsión", desc: "Coacción tras obtener material íntimo (fotografías/vídeos) para forzar pagos o exigir más contenido." },
+              { term: "Impacto psicológico y reputacional", desc: "Afectación a la privacidad personal y pérdida económica continuada." }
+            ]
+          },
+          {
+            title: "3. Fraudes basados en software malicioso",
+            concepts: [
+              { term: "Falsos antivirus (Rogues)", desc: "Alertas engañosas sobre infecciones inexistentes para inducir la compra o instalación de software nocivo." },
+              { term: "Herramientas de verificación", desc: "Uso de plataformas especializadas de análisis de fraudes como ScamDigger o registros de scam letters." },
+              { term: "Medidas preventivas", desc: "Robustecimiento de credenciales, concienciación y verificación previa de solicitudes de fondos." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "¿Cómo se denominan las estafas que prometen una fortuna ficticia a cambio de un anticipo previo?",
+            options: ["Cartas nigerianas (fraude de pago anticipado).", "Ataque Man-in-the-Middle.", "Cross-site request forgery.", "Buffer overflow."],
+            correct: 0,
+            expl: "Las cartas nigerianas o estafas 419 engañan prometiendo herencias o premios si la víctima adelanta dinero."
+          },
+          {
+            q: "¿En qué consiste el 'Romance Scam' o estafa del amor?",
+            options: [
+              "Vender cursos de citas con descuento.",
+              "Crear perfiles falsos fingiendo vínculos emocionales para solicitar dinero sistemáticamente.",
+              "Infectar el router con malware silencioso.",
+              "Robar contraseñas de videojuegos."
+            ],
+            correct: 1,
+            expl: "El atacante manipula psicológicamente a la víctima ganándose su afecto para pedir ayudas económicas urgentes."
+          },
+          {
+            q: "¿Qué es un software de tipo 'Rogue' o falso antivirus?",
+            options: [
+              "Un antivirus de alto rendimiento certificado.",
+              "Software que muestra alertas de infecciones falsas para engañar al usuario y cobrar por la desinfección.",
+              "Un protocolo de cifrado para discos duros.",
+              "Un navegador de la Dark Web."
+            ],
+            correct: 1,
+            expl: "Los Rogues asustan al usuario con advertencias falsas de virus para vender licencias inútiles o instalar troyanos."
+          },
+          {
+            q: "¿Qué vector explotan las estafas basadas en 'urgencias ficticias'?",
+            options: [
+              "Llamadas o mensajes de falsos hijos o familiares en emergencias extremas exigiendo transferencias rápidas.",
+              "Actualizaciones de Windows Update.",
+              "Averías en la fibra óptica.",
+              "Vencimiento de patentes."
+            ],
+            correct: 0,
+            expl: "Provocan pánico y premura emocional en los padres o familiares para que envíen dinero sin verificar."
+          },
+          {
+            q: "¿Cómo se define la sextorsión?",
+            options: [
+              "La compra legal de contenidos para adultos.",
+              "El chantaje económico bajo la amenaza de difundir imágenes o vídeos íntimos de la víctima.",
+              "La pérdida fortuita de un teléfono móvil.",
+              "El envío de spam publicitario no deseado."
+            ],
+            correct: 1,
+            expl: "Coacciona a la víctima amenazando con arruinar su reputación social o familiar si no paga un rescate."
+          },
+          {
+            q: "¿Qué señal de alerta es típica en compras fraudulentas de vehículos por Internet?",
+            options: [
+              "Precios excesivamente elevados.",
+              "Precios anormalmente bajos exigiendo transferencias de fianza antes de ver el coche.",
+              "Entrega en mano en un concesionario oficial.",
+              "Factura oficial con garantía escrita."
+            ],
+            correct: 1,
+            expl: "Los estafadores publican ofertas 'demasiado buenas para ser verdad' pidiendo depósitos urgentes."
+          },
+          {
+            q: "¿Cuál de las siguientes plataformas es una herramienta para catalogar y consultar scam letters?",
+            options: ["ScamDigger", "Visual Studio", "Autocad", "Excel"],
+            correct: 0,
+            expl: "ScamDigger y portales similares registran patrones textuales e historiales de estafas electrónicas."
+          },
+          {
+            q: "¿Cuál es la mejor defensa frente a solicitudes urgentes de dinero por mensajería?",
+            options: [
+              "Realizar el pago de inmediato.",
+              "Verificar por un canal alternativo seguro llamando directamente a la persona antes de transferir.",
+              "Compartir la tarjeta bancaria en redes sociales.",
+              "Borrar el sistema operativo."
+            ],
+            correct: 1,
+            expl: "La verificación por un canal de confianza independiente rompe el engaño de la ingeniería social."
+          },
+          {
+            q: "¿Qué componente psicológico es explotado con mayor frecuencia en la ingeniería social?",
+            options: [
+              "La curiosidad, el miedo, la urgencia o la codicia.",
+              "El conocimiento de matemáticas avanzadas.",
+              "La destreza con la terminal Linux.",
+              "El dominio de la gramática inglesa."
+            ],
+            correct: 0,
+            expl: "Los ciberdelincuentes manipulan sesgos emocionales primarios para eludir el juicio crítico de la víctima."
+          },
+          {
+            q: "¿Qué repercusión tiene el fraude digital en las víctimas más allá de lo económico?",
+            options: [
+              "Ninguna, no causa impacto.",
+              "Grave daño psicológico, vergüenza, estrés y deterioro reputacional.",
+              "Aumento de la velocidad del ordenador.",
+              "Desaparición del historial de navegación."
+            ],
+            correct: 1,
+            expl: "Las estafas afectivas y la extorsión generan traumas graves y aislamiento en las personas afectadas."
+          }
+        ]
+      },
+      {
+        id: 8,
+        title: "Tema 8: Fraudes en Medios de Pago",
+        blocks: [
+          {
+            title: "1. Ecosistema de pagos y transacciones",
+            concepts: [
+              { term: "Medios tradicionales vs. digitales", desc: "Efectivo y transferencias frente a pagos por móvil, tarjetas electrónicas y pasarelas de comercio online." },
+              { term: "Naturaleza del fraude bancario", desc: "Acciones dirigidas a la falsificación, engaño o sustracción no consentida de fondos." },
+              { term: "Cadena de autenticación", desc: "Validación de identidad entre el usuario, la pasarela de pago y la entidad emisora." }
+            ]
+          },
+          {
+            title: "2. Seguridad en tarjetas EMV y NFC",
+            concepts: [
+              { term: "Tecnología de chip EMV", desc: "Autenticación criptográfica para operaciones presenciales." },
+              { term: "Transacciones NFC (contactless)", desc: "Transmisión sin contacto a corta distancia y vectores de lectura no autorizada." },
+              { term: "Vulnerabilidades y clonación", desc: "Limitaciones en la verificación fuera de línea y captura indebida de parámetros transaccionales." }
+            ]
+          },
+          {
+            title: "3. Plataformas móviles y billeteras virtuales",
+            concepts: [
+              { term: "Billeteras electrónicas (wallets)", desc: "Almacenamiento seguro de credenciales de pago y tokenización de cuentas." },
+              { term: "Pagos instantáneos (Bizum)", desc: "Envío rápido de fondos vinculado a telefonía móvil y fraudes por solicitud invertida o ingeniería social." },
+              { term: "Riesgos en banca móvil", desc: "Compromiso de terminales móviles que actúan como TPVs y troyanos bancarios enfocados en transferencias." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "¿En qué consiste el estándar de seguridad EMV en tarjetas de pago físicas?",
+            options: [
+              "En la banda magnética clásica sin cifrar.",
+              "En un microchip criptográfico que genera un criptograma dinámico único por cada transacción presencial.",
+              "En imprimir el PIN en el reverso de la tarjeta.",
+              "En la firma manuscrita con bolígrafo."
+            ],
+            correct: 1,
+            expl: "EMV sustituyó a la vulnerable banda magnética impidiendo la clonación simple de los datos estáticos."
+          },
+          {
+            q: "¿Qué tecnología inalámbrica permite los pagos 'contactless' a corta distancia?",
+            options: ["NFC (Near Field Communication)", "Wi-Fi 6", "Infrarrojos 3G", "Satélite GPS"],
+            correct: 0,
+            expl: "NFC opera a frecuencias de 13,56 MHz para intercambios seguros a muy pocos centímetros."
+          },
+          {
+            q: "¿Cómo protege la 'tokenización' los números de tarjeta en billeteras móviles (Apple/Google Pay)?",
+            options: [
+              "Publicando el número en la nube pública.",
+              "Reemplazando el número real (PAN) por un token numérico sustitutivo sin valor fuera del dispositivo.",
+              "Eliminando la necesidad de saldo en la cuenta.",
+              "Guardando la clave bancaria en texto claro."
+            ],
+            correct: 1,
+            expl: "El comercio nunca recibe el número real de la tarjeta, reduciendo drásticamente el impacto de fugas de datos."
+          },
+          {
+            q: "¿Cuál es el engaño común en Bizum denominado 'solicitud invertida'?",
+            options: [
+              "Enviar más dinero del acordado por error.",
+              "El estafador envía una petición de cobro fingiendo que es un pago a favor de la víctima para que esta la autorice.",
+              "Hackear los servidores centrales del banco de España.",
+              "Cambiar el número de teléfono en la SIM."
+            ],
+            correct: 1,
+            expl: "La víctima cree que está aceptando recibir dinero cuando en realidad está aprobando enviar sus propios fondos."
+          },
+          {
+            q: "¿Qué función cumple un troyano bancario en un smartphone Android infectado?",
+            options: [
+              "Acelerar la conexión a internet.",
+              "Superponer pantallas falsas sobre la app del banco (overlay) para robar credenciales y desviar SMS con códigos OTP.",
+              "Optimizar la batería del terminal.",
+              "Desactivar la linterna del teléfono."
+            ],
+            correct: 1,
+            expl: "Los troyanos bancarios capturan credenciales y leen los códigos de verificación para autorizar transferencias fraudulentas."
+          },
+          {
+            q: "¿Qué es el 'skimming' en medios de pago tradicionales?",
+            options: [
+              "El clonado fraudulento de bandas magnéticas mediante dispositivos superpuestos en cajeros o datáfonos.",
+              "La compra de acciones en bolsa.",
+              "El pago de impuestos con tarjeta de crédito.",
+              "La actualización del software del móvil."
+            ],
+            correct: 0,
+            expl: "Los skimmers leen y copian físicamente la banda de la tarjeta para clonarla posteriormente."
+          },
+          {
+            q: "¿Qué requisito exige la directiva europea PSD2 para pagos electrónicos seguros?",
+            options: [
+              "Autenticación Reforzada de Clientes (SCA) basada en doble factor (2FA).",
+              "Prohibición de compras superiores a 5 euros.",
+              "Uso obligatorio de dinero en efectivo.",
+              "Eliminación de contraseñas bancarias."
+            ],
+            correct: 0,
+            expl: "Exige combinar al menos dos elementos: algo que sabes, algo que posees o algo que eres (biometría)."
+          },
+          {
+            q: "¿Por qué las operaciones offline en tarjetas EMV presentan mayores riesgos que las online?",
+            options: [
+              "Porque la tarjeta explota al usarse.",
+              "Porque no validan el saldo ni la lista de tarjetas robadas en tiempo real contra el servidor bancario emisor.",
+              "Porque requieren conexión por satélite.",
+              "Porque no usan electricidad."
+            ],
+            correct: 1,
+            expl: "Al no consultar en directo con la entidad emisora, se basan en límites de riesgo prefijados en el chip."
+          },
+          {
+            q: "¿Qué es el código CVV/CVC que figura en el reverso de las tarjetas?",
+            options: [
+              "El código postal del titular.",
+              "Un código de verificación de 3 o 4 dígitos para operaciones de comercio electrónico donde no está presente la tarjeta física.",
+              "El saldo disponible en la cuenta.",
+              "El número de teléfono del banco."
+            ],
+            correct: 1,
+            expl: "Demuestra en entornos Card-Not-Present (CNP) que quien compra tiene acceso visual a la tarjeta física."
+          },
+          {
+            q: "¿Qué medida de precaución es clave al vender artículos de segunda mano y cobrar por Bizum?",
+            options: [
+              "Aceptar cualquier enlace web enviado por el comprador.",
+              "Leer con atención si la notificación recibida del banco es un 'Envío de dinero' o una 'Solicitud de pago'.",
+              "Dar el número PIN de la tarjeta al comprador.",
+              "Hacer una captura de pantalla del DNI."
+            ],
+            correct: 1,
+            expl: "Confirmar que el saldo ha ingresado efectivamente en la app del banco antes de entregar el producto evita fraudes."
+          }
+        ]
+      },
+      {
+        id: 9,
+        title: "Tema 9: Defensa en Redes",
+        blocks: [
+          {
+            title: "1. Seguridad en Operaciones (OPSEC) y controles",
+            concepts: [
+              { term: "Proceso OPSEC", desc: "Identificación de información crítica, análisis de amenazas, evaluación de debilidades, ponderación de riesgos y contramedidas." },
+              { term: "Controles sobre activos TI", desc: "Clasificación de recursos (hardware, software y datos) y aplicación de controles lógicos y temporales." },
+              { term: "Auditoría y registros", desc: "Centralización y supervisión de pistas de auditoría (logs) para trazabilidad de incidentes." }
+            ]
+          },
+          {
+            title: "2. Sistemas de Detección de Intrusos (IDS)",
+            concepts: [
+              { term: "NIDS (Red)", desc: "Inspección del tráfico a través de sondas en puntos de concentración; cubre áreas extensas con menor coste de agentes." },
+              { term: "HIDS (Host)", desc: "Monitorización interna a nivel de endpoints e integridad de ficheros; alta visibilidad local pero mayor sobrecarga de gestión." },
+              { term: "Firmas vs. Anomalías", desc: "Reglas estáticas (requieren afinado para evitar falsos positivos/negativos) frente a modelos de línea base de comportamiento habitual." }
+            ]
+          },
+          {
+            title: "3. Sistemas de engaño y contención",
+            concepts: [
+              { term: "Honeypots", desc: "Trampas desplegadas para desviar atacantes, estudiar técnicas maliciosas y obtener alertas tempranas." },
+              { term: "Nivel de interacción", desc: "Honeypots de baja interacción (emulación de puertos/servicios básicos) frente a alta interacción (sistemas operativos reales instrumentados)." },
+              { term: "Riesgo operativo", desc: "Necesidad de aislamiento perimetral estricto para evitar que el señuelo sea usado como pivote de ataque." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "¿Cuáles son las fases ordenadas del ciclo clásico de Seguridad en Operaciones (OPSEC)?",
+            options: [
+              "Identificar info crítica ➔ Analizar amenazas ➔ Evaluar debilidades ➔ Ponderar riesgos ➔ Aplicar contramedidas.",
+              "Instalar antivirus ➔ Formatear servidor ➔ Crear usuarios ➔ Pagar rescate.",
+              "Comprar cortafuegos ➔ Encender ordenadores ➔ Apagar monitor.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 0,
+            expl: "El estándar OPSEC de 5 pasos parte de identificar qué debe protegerse para aplicar defensas proporcionales."
+          },
+          {
+            q: "¿Cuál es la principal ventaja técnica de un NIDS frente a un HIDS?",
+            options: [
+              "Monitorea el registro del registro de Windows.",
+              "Cubre amplias zonas de red corporativa mediante sondas en puntos de concentración sin instalar agentes en cada máquina.",
+              "Es inmune al tráfico cifrado.",
+              "No necesita alimentación eléctrica."
+            ],
+            correct: 1,
+            expl: "Los NIDS inspeccionan el tráfico de red general con menor coste de despliegue que los agentes endpoint."
+          },
+          {
+            q: "¿Qué capacidad crítica aporta un HIDS (Host-based IDS)?",
+            options: [
+              "Supervisar el tráfico de todos los routers de Internet.",
+              "Verificar la integridad de archivos del sistema local, accesos a registros y procesos en el propio host.",
+              "Aumentar el ancho de banda del conector RJ45.",
+              "Descifrar todas las comunicaciones Tor."
+            ],
+            correct: 1,
+            expl: "El HIDS tiene visibilidad detallada de lo que ocurre dentro del sistema operativo, detectando modificaciones no autorizadas."
+          },
+          {
+            q: "¿En qué se diferencia la detección por firmas de la detección por anomalías?",
+            options: [
+              "Las firmas usan patrones conocidos predefinidos; las anomalías alertan sobre desviaciones frente a una línea base de conducta normal.",
+              "Las firmas solo sirven para correos y las anomalías para redes.",
+              "Las anomalías nunca generan falsos positivos.",
+              "Son términos totalmente idénticos."
+            ],
+            correct: 0,
+            expl: "Las firmas detectan amenazas catalogadas; las anomalías pueden descubrir ataques novedosos pero exigen calibración."
+          },
+          {
+            q: "¿Qué es un Honeypot en el ámbito de la ciberdefensa?",
+            options: [
+              "Un sistema trampa señuelo diseñado para engañar atacantes, desviar intrusiones y estudiar sus tácticas.",
+              "Un gestor de contraseñas bancarias.",
+              "Un tipo de ataque de phishing bancario.",
+              "Un virus que infecta memorias USB."
+            ],
+            correct: 0,
+            expl: "Los honeypots simulan servicios vulnerables para atraer a los adversarios y generar alertas tempranas."
+          },
+          {
+            q: "¿Cuál es la diferencia entre un honeypot de baja interacción y uno de alta interacción?",
+            options: [
+              "El de baja interacción simula servicios básicos; el de alta ejecuta un sistema operativo real monitorizado a fondo.",
+              "El de baja interacción cuesta millones y el de alta es gratis.",
+              "El de alta interacción solo admite conexiones por cable.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 0,
+            expl: "La alta interacción permite capturar el comportamiento completo del malware, pero entraña mayor riesgo de contención."
+          },
+          {
+            q: "¿Qué peligro operativo crítico existe si un honeypot no está debidamente aislado?",
+            options: [
+              "Que gaste demasiado papel en la impresora.",
+              "Que el atacante lo tome por completo y lo use como nodo pivote para atacar la red interna corporativa.",
+              "Que los empleados lo usen para ver películas.",
+              "Que bloquee la salida a Internet de Google."
+            ],
+            correct: 1,
+            expl: "El señuelo debe residir en una zona estricta de contención sin acceso de vuelta a la intranet corporativa."
+          },
+          {
+            q: "¿Qué función cumple la centralización y preservación de logs (pistas de auditoría)?",
+            options: [
+              "Llenar discos duros sin propósito.",
+              "Garantizar la trazabilidad forense inalterable y la reconstrucción cronológica ante incidentes de seguridad.",
+              "Evitar tener que configurar contraseñas.",
+              "Proteger contra incendios físicos."
+            ],
+            correct: 1,
+            expl: "Centralizar eventos en servidores SIEM evita que un atacante borre los registros locales para ocultar su huella."
+          },
+          {
+            q: "¿Qué mecanismo de defensa bloquea activamente el tráfico malicioso al detectarlo?",
+            options: [
+              "Un IPS (Intrusion Prevention System).",
+              "Un cable Ethernet desconectado.",
+              "Un teclado inalámbrico.",
+              "Un sniffer pasivo."
+            ],
+            correct: 0,
+            expl: "A diferencia del IDS pasivo (que solo alerta), el IPS opera inline y descarta los paquetes atacantes al vuelo."
+          },
+          {
+            q: "¿A qué se le denomina 'afinado' (tuning) de un sistema de detección de intrusos?",
+            options: [
+              "Pintar el chasis del servidor.",
+              "Ajustar reglas para reducir al mínimo los falsos positivos y falsos negativos.",
+              "Cambiar la tarjeta gráfica por una de gaming.",
+              "Instalar un sintetizador de música."
+            ],
+            correct: 1,
+            expl: "El afinado elimina ruidos y alertas innecesarias para que el equipo de analistas del SOC no sufra fatiga de alertas."
+          }
+        ]
+      },
+      {
+        id: 10,
+        title: "Tema 10: Detección y Respuesta ante Amenazas",
+        blocks: [
+          {
+            title: "1. Marcos operativos y ciberinteligencia",
+            concepts: [
+              { term: "Matriz MITRE ATT&CK", desc: "Base de conocimiento de tácticas (objetivo/«por qué») y técnicas/subtécnicas (método/«cómo») observadas en incidentes reales." },
+              { term: "Enfoque en TTP vs. IoC", desc: "Priorización de comportamientos y procedimientos adversarios frente a indicadores estáticos fácilmente mutables (hashes, IPs)." },
+              { term: "Cumplimiento y mapeo", desc: "Alineación de detecciones con marcos de seguridad y controles normativos (p. ej., NIST 800-53)." }
+            ]
+          },
+          {
+            title: "2. Plataformas de visibilidad y correlación",
+            concepts: [
+              { term: "Sistemas SIEM", desc: "Centralización de registros, retención a largo plazo, análisis correlacionado y cumplimiento normativo." },
+              { term: "Automatización SOAR", desc: "Orquestación y respuesta automatizada ante incidentes mediante ejecución de flujos de trabajo (playbooks)." },
+              { term: "Soluciones integradas (Wazuh)", desc: "Monitorización de eventos, evaluación de cumplimiento de configuración (SCA) e inspección de integridad de ficheros." }
+            ]
+          },
+          {
+            title: "3. Operaciones avanzadas y respuesta",
+            concepts: [
+              { term: "Threat Hunting", desc: "Búsqueda proactiva e iterativa de adversarios internos que hayan evadido las defensas automatizadas." },
+              { term: "Emulación de adversarios", desc: "Simulación controlada de técnicas ofensivas para verificar la cobertura y eficacia de las reglas de detección." },
+              { term: "Respuesta a incidentes y forense", desc: "Contención rápida, erradicación de amenazas, adquisición de evidencias y restauración del servicio." }
+            ]
+          }
+        ],
+        questions: [
+          {
+            q: "¿Cómo clasifica la matriz MITRE ATT&CK las acciones de los atacantes?",
+            options: [
+              "Por orden alfabético de los apellidos de los crackers.",
+              "En Tácticas (el 'por qué' u objetivo) y Técnicas / Subtécnicas (el 'cómo' o procedimiento).",
+              "En precios de rescate en bitcoins.",
+              "Por el color del icono del software."
+            ],
+            correct: 1,
+            expl: "MITRE ATT&CK documenta la conducta del adversario estructurando tácticas, técnicas y procedimientos (TTPs)."
+          },
+          {
+            q: "Según la Pirámide del Dolor de David Bianco, ¿qué elemento es el más costoso de modificar para un atacante?",
+            options: [
+              "Direcciones IP.",
+              "Hashes de archivos (MD5/SHA256).",
+              "TTPs (Tácticas, Técnicas y Procedimientos).",
+              "Nombres de dominio."
+            ],
+            correct: 2,
+            expl: "Cambiar de hash o IP cuesta segundos al adversario; cambiar sus TTPs exige reentrenarse y modificar su metodología."
+          },
+          {
+            q: "¿Qué función primordial realiza una plataforma SIEM (Security Information and Event Management)?",
+            options: [
+              "Centralizar, normalizar y correlacionar logs de múltiples fuentes para detectar anomalías y cumplir normativas.",
+              "Sustituir a los ordenadores de los usuarios.",
+              "Minar criptomonedas durante la noche.",
+              "Apagar los servidores si sube la temperatura ambiente."
+            ],
+            correct: 0,
+            expl: "El SIEM reúne registros de firewalls, servidores y aplicaciones para identificar correlaciones de ataque complejas."
+          },
+          {
+            q: "¿Qué aporta una solución SOAR (Security Orchestration, Automation and Response)?",
+            options: [
+              "Automatización de respuestas mediante playbooks ante incidentes rutinarios para acelerar la mitigación.",
+              "Diseño de logotipos corporativos.",
+              "Grabación de llamadas telefónicas comerciales.",
+              "Creación de contratos físicos en papel."
+            ],
+            correct: 0,
+            expl: "SOAR conecta herramientas entre sí y ejecuta respuestas programadas (aislar hosts, bloquear IPs) en milisegundos."
+          },
+          {
+            q: "¿Qué capacidades integra la plataforma de código abierto Wazuh?",
+            options: [
+              "Monitorización de eventos en endpoints, evaluación SCA (Security Configuration Assessment) e integridad de archivos (FIM).",
+              "Edición y renderizado de vídeos 4K.",
+              "Navegación exclusiva por redes Freenet.",
+              "Gestión de nóminas de empleados."
+            ],
+            correct: 0,
+            expl: "Wazuh combina funciones XDR y SIEM ligero con inspección local de integridad de ficheros e inventario de vulnerabilidades."
+          },
+          {
+            q: "¿En qué se diferencia el Threat Hunting de las alertas automatizadas?",
+            options: [
+              "Es una búsqueda proactiva e hipótesis basada en analistas humanos que asumen que el adversario ya puede estar dentro evadiendo defensas.",
+              "Es un escaneo pasivo que solo se ejecuta cuando falla el antivirus.",
+              "Consiste en llamar por teléfono al atacante para negociar.",
+              "Es un test que se hace solo una vez al año."
+            ],
+            correct: 0,
+            expl: "El cazador de amenazas busca anomalías sutiles que las firmas y reglas fijas no han logrado detectar."
+          },
+          {
+            q: "¿Cuál es el objetivo principal de la emulación de adversarios (ej. Atomic Red Team)?",
+            options: [
+              "Destruir la base de datos de producción.",
+              "Simular de forma controlada técnicas ofensivas reales para probar y validar la efectividad de las reglas de detección del SOC.",
+              "Espiar a la competencia corporativa.",
+              "Descargar ficheros infectados sin supervisión."
+            ],
+            correct: 1,
+            expl: "Comprueba si las defensas realmente disparan alarmas ante técnicas conocidas del marco MITRE ATT&CK."
+          },
+          {
+            q: "¿Cuáles son las 4 fases fundamentales del ciclo de Respuesta a Incidentes?",
+            options: [
+              "Contención ➔ Erradicación ➔ Adquisición de evidencias ➔ Restauración del servicio y lecciones aprendidas.",
+              "Negación ➔ Culpa ➔ Despido ➔ Compra de nuevo equipo.",
+              "Formateo rápido ➔ Silencio corporativo ➔ Ignorar auditorías ➔ Continuar.",
+              "Ninguna opción es correcta."
+            ],
+            correct: 0,
+            expl: "Sigue los marcos de NIST y SANS: aislar el daño, eliminar la causa raíz, preservar evidencias y recuperar la operación normal."
+          },
+          {
+            q: "¿Por qué es crucial la 'cadena de custodia' durante el análisis forense digital?",
+            options: [
+              "Para evitar que se pierdan las claves de los candados del rack.",
+              "Para asegurar la validez legal y procesal de las evidencias probando que no han sido alteradas ni contaminadas.",
+              "Para pagar menos impuestos al perito.",
+              "Para acelerar la clonación del disco duro."
+            ],
+            correct: 1,
+            expl: "Sin cadena de custodia rigurosa, un tribunal judicial puede anular cualquier prueba digital en un proceso penal."
+          },
+          {
+            q: "¿Qué estándar del NIST se utiliza frecuentemente para mapear controles de seguridad corporativos?",
+            options: ["NIST SP 800-53", "NIST ISO 9001", "IEEE 802.11b", "RFC 1918"],
+            correct: 0,
+            expl: "El catálogo NIST Special Publication 800-53 es el estándar de referencia global para controles de seguridad y privacidad."
+          }
+        ]
+      }
+    ];
+
+    /* ==========================================================================
+       2. SISTEMA DE AUDIO NATIVO (WEB AUDIO API - SIN DEPENDENCIAS)
+       ========================================================================== */
+    let audioContext = null;
+    let isSoundEnabled = true;
+
+    function getAudioContext() {
+      if (!audioContext) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          audioContext = new AudioCtx();
+        }
+      }
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      return audioContext;
+    }
+
+    function playBeep(freq, type, duration, delay = 0) {
+      if (!isSoundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + duration);
+      } catch (e) {
+        console.warn("Audio API no soportado:", e);
+      }
+    }
+
+    function soundCorrect() {
+      playBeep(523.25, 'sine', 0.1, 0.0);    // C5
+      playBeep(659.25, 'sine', 0.15, 0.08);  // E5
+      playBeep(1046.50, 'sine', 0.25, 0.16); // C6
+    }
+
+    function soundWrong() {
+      playBeep(220.0, 'sawtooth', 0.18, 0.0); // A3
+      playBeep(164.8, 'sawtooth', 0.28, 0.1); // E3
+    }
+
+    function soundFanfare() {
+      playBeep(523.25, 'triangle', 0.12, 0.0);
+      playBeep(659.25, 'triangle', 0.12, 0.12);
+      playBeep(783.99, 'triangle', 0.15, 0.24);
+      playBeep(1046.50, 'triangle', 0.4, 0.38);
+    }
+
+    function triggerHaptic(type = 'success') {
+      if ('vibrate' in navigator) {
+        try {
+          if (type === 'success') {
+            navigator.vibrate(35);
+          } else if (type === 'error') {
+            navigator.vibrate([60, 40, 60]);
+          }
+        } catch (e) {}
+      }
+    }
+
+    /* ==========================================================================
+       3. GESTIÓN DE TAMAÑO DE FUENTE (--A, -A, A, A+, A++)
+       ========================================================================== */
+    const FONT_SIZES = [
+      { key: "xxs", label: "--A" },
+      { key: "xs",  label: "-A" },
+      { key: "normal", label: "A" },
+      { key: "xl",  label: "A+" },
+      { key: "xxl", label: "A++" }
+    ];
+    let currentFontIdx = 2; // Por defecto "A" (normal)
+
+    function updateFontSize() {
+      const cfg = FONT_SIZES[currentFontIdx];
+      document.documentElement.setAttribute('data-size', cfg.key);
+      document.getElementById('lblFontSize').textContent = cfg.label;
+      localStorage.setItem('oled_fontsize', currentFontIdx);
+    }
+
+    document.getElementById('btnFontSize').addEventListener('click', () => {
+      currentFontIdx = (currentFontIdx + 1) % FONT_SIZES.length;
+      updateFontSize();
+    });
+
+    /* ==========================================================================
+       4. MODO CONTRASTE EXTREMO
+       ========================================================================== */
+    let isExtremeContrast = false;
+    const btnContrast = document.getElementById('btnContrast');
+
+    function updateContrastMode() {
+      if (isExtremeContrast) {
+        document.body.classList.add('extreme-contrast');
+        btnContrast.classList.add('active');
+        btnContrast.innerHTML = "⚡ ON";
+      } else {
+        document.body.classList.remove('extreme-contrast');
+        btnContrast.classList.remove('active');
+        btnContrast.innerHTML = "⚡";
+      }
+      localStorage.setItem('oled_contrast', isExtremeContrast ? '1' : '0');
+    }
+
+    btnContrast.addEventListener('click', () => {
+      isExtremeContrast = !isExtremeContrast;
+      updateContrastMode();
+    });
+
+    /* AUDIO TOGGLE */
+    const btnAudio = document.getElementById('btnAudio');
+    btnAudio.addEventListener('click', () => {
+      isSoundEnabled = !isSoundEnabled;
+      btnAudio.textContent = isSoundEnabled ? "🔊" : "🔇";
+      localStorage.setItem('oled_sound', isSoundEnabled ? '1' : '0');
+    });
+
+    /* ==========================================================================
+       5. NAVEGACIÓN ENTRE PESTAÑAS MÓVILES
+       ========================================================================== */
+    const navTabs = document.querySelectorAll('.nav-tab');
+    const viewSections = document.querySelectorAll('.view-section');
+
+    function switchView(viewId) {
+      viewSections.forEach(sec => sec.classList.remove('active'));
+      navTabs.forEach(tab => tab.classList.remove('active'));
+
+      const target = document.getElementById(viewId);
+      if (target) target.classList.add('active');
+
+      const activeTab = document.querySelector(`.nav-tab[data-view="${viewId}"]`);
+      if (activeTab) activeTab.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    navTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const view = tab.getAttribute('data-view');
+        switchView(view);
+      });
+    });
+
+    /* ==========================================================================
+       6. LÓGICA DE LA PARTE 1: REPASO 3x3
+       ========================================================================== */
+    const selectStudy = document.getElementById('selectStudyTopic');
+    const studyContainer = document.getElementById('studyContent');
+    const topicCounter = document.getElementById('topicCounter');
+
+    function populateTopicSelectors() {
+      TOPICS_DATA.forEach((t, idx) => {
+        const opt1 = document.createElement('option');
+        opt1.value = t.id;
+        opt1.textContent = t.title;
+        selectStudy.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = t.id;
+        opt2.textContent = t.title;
+        document.getElementById('selectQuizTopic').appendChild(opt2);
+      });
+    }
+
+    function renderStudyTopic(topicId) {
+      const topic = TOPICS_DATA.find(t => t.id === parseInt(topicId, 10));
+      if (!topic) return;
+
+      topicCounter.textContent = `${topic.id} de ${TOPICS_DATA.length}`;
+
+      let html = `
+        <h1 class="scheme-title">${topic.title}</h1>
+        <p class="scheme-subtitle">Estructura esquemática 3x3 • 3 Bloques principales con 3 Conceptos clave cada uno</p>
+      `;
+
+      topic.blocks.forEach((b, bIdx) => {
+        html += `
+          <div class="block-card">
+            <div class="block-header">
+              <span class="block-title">${b.title}</span>
+              <span style="font-size: 0.72rem; color: var(--text-muted); font-weight:700;">BLOQUE ${bIdx + 1} DE 3</span>
+            </div>
+        `;
+        b.concepts.forEach(c => {
+          html += `
+            <div class="concept-item">
+              <div class="concept-dot"></div>
+              <div class="concept-content">
+                <strong>${c.term}</strong>
+                <span>${c.desc}</span>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      });
+
+      studyContainer.innerHTML = html;
+    }
+
+    selectStudy.addEventListener('change', (e) => {
+      renderStudyTopic(e.target.value);
+    });
+
+    document.getElementById('btnGoToQuiz').addEventListener('click', () => {
+      const currentId = selectStudy.value;
+      document.getElementById('selectQuizTopic').value = currentId;
+      switchView('viewQuiz');
+      startQuiz('topic', parseInt(currentId, 10));
+    });
+
+    /* ==========================================================================
+       7. LÓGICA DE LA PARTE 2: JUEGO DE PREGUNTAS Y RESPUESTAS (QUIZ)
+       ========================================================================== */
+    let currentQuestionsPool = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let streak = 0;
+    let maxStreakSession = 0;
+    let wrongAnswersList = [];
+    let isAnswerSubmitted = false;
+
+    // Algoritmo Fisher-Yates para barajar sin repetición
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function startQuiz(mode = 'topic', topicId = 1) {
+      score = 0;
+      streak = 0;
+      currentQuestionIndex = 0;
+      wrongAnswersList = [];
+      isAnswerSubmitted = false;
+
+      let rawQuestions = [];
+
+      if (mode === 'topic') {
+        const t = TOPICS_DATA.find(item => item.id === topicId);
+        rawQuestions = t ? t.questions.map(q => ({ ...q, topicName: t.title })) : [];
+      } else if (mode === 'random') {
+        // Selecciona 10 preguntas aleatorias de todos los temas sin repetir
+        let allQ = [];
+        TOPICS_DATA.forEach(t => {
+          t.questions.forEach(q => allQ.push({ ...q, topicName: t.title }));
+        });
+        rawQuestions = shuffleArray(allQ).slice(0, 10);
+      } else if (mode === 'mistakes') {
+        rawQuestions = [...wrongAnswersList];
+        wrongAnswersList = [];
+      }
+
+      currentQuestionsPool = shuffleArray(rawQuestions);
+
+      document.getElementById('quizSetupCard').style.display = 'none';
+      document.getElementById('quizResultsArea').style.display = 'none';
+      document.getElementById('quizActiveArea').style.display = 'block';
+
+      renderActiveQuestion();
+    }
+
+    function renderActiveQuestion() {
+      if (currentQuestionIndex >= currentQuestionsPool.length) {
+        finishQuiz();
+        return;
+      }
+
+      isAnswerSubmitted = false;
+      const qData = currentQuestionsPool[currentQuestionIndex];
+
+      // UI Actualización
+      document.getElementById('quizCounter').textContent = `Pregunta ${currentQuestionIndex + 1}/${currentQuestionsPool.length}`;
+      document.getElementById('quizScoreText').textContent = `${score} pts`;
+      document.getElementById('quizStreakText').textContent = `Racha x${Math.max(1, streak)}`;
+      
+      const pct = (currentQuestionIndex / currentQuestionsPool.length) * 100;
+      document.getElementById('quizProgressBar').style.width = `${pct}%`;
+
+      document.getElementById('questionMetaTag').textContent = qData.topicName || "CIBERSEGURIDAD";
+      document.getElementById('questionTextContent').textContent = qData.q;
+
+      // Ocultar feedback y botón siguiente
+      document.getElementById('feedbackCard').style.display = 'none';
+      document.getElementById('btnNextQuestion').style.display = 'none';
+
+      // Barajar opciones manteniendo referencia a la correcta
+      const originalOptions = qData.options.map((text, idx) => ({
+        text,
+        isCorrect: idx === qData.correct
+      }));
+      const shuffledOptions = shuffleArray(originalOptions);
+
+      const optionsBox = document.getElementById('optionsContainer');
+      optionsBox.innerHTML = '';
+
+      const letters = ['A', 'B', 'C', 'D'];
+      shuffledOptions.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = `
+          <div class="option-letter">${letters[idx]}</div>
+          <div class="option-text">${opt.text}</div>
+        `;
+        btn.addEventListener('click', () => handleOptionSelection(btn, opt, shuffledOptions, qData));
+        optionsBox.appendChild(btn);
+      });
+    }
+
+    function handleOptionSelection(selectedBtn, chosenOpt, allOptions, questionData) {
+      if (isAnswerSubmitted) return;
+      isAnswerSubmitted = true;
+
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(b => b.disabled = true);
+
+      const feedbackCard = document.getElementById('feedbackCard');
+      const feedbackTitle = document.getElementById('feedbackTitle');
+      const feedbackExpl = document.getElementById('feedbackExpl');
+      const nextBtn = document.getElementById('btnNextQuestion');
+
+      if (chosenOpt.isCorrect) {
+        selectedBtn.classList.add('correct');
+        streak++;
+        if (streak > maxStreakSession) maxStreakSession = streak;
+        const points = 100 * Math.min(streak, 4);
+        score += points;
+
+        soundCorrect();
+        triggerHaptic('success');
+
+        feedbackTitle.className = 'feedback-title correct';
+        feedbackTitle.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          ¡Respuesta Correcta! (+${points} pts)
+        `;
+      } else {
+        selectedBtn.classList.add('wrong');
+        streak = 0;
+        soundWrong();
+        triggerHaptic('error');
+
+        // Resaltar la verdadera correcta
+        buttons.forEach((b, idx) => {
+          if (allOptions[idx].isCorrect) {
+            b.classList.add('correct');
+          }
+        });
+
+        // Registrar fallo para repasar
+        wrongAnswersList.push(questionData);
+
+        feedbackTitle.className = 'feedback-title wrong';
+        feedbackTitle.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Incorrecta
+        `;
+      }
+
+      feedbackExpl.textContent = questionData.expl || "Revisa los conceptos clave en el repaso esquemático 3x3.";
+      feedbackCard.style.display = 'block';
+      nextBtn.style.display = 'flex';
+      nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.getElementById('btnNextQuestion').addEventListener('click', () => {
+      currentQuestionIndex++;
+      renderActiveQuestion();
+    });
+
+    function finishQuiz() {
+      document.getElementById('quizActiveArea').style.display = 'none';
+      document.getElementById('quizResultsArea').style.display = 'block';
+
+      const total = currentQuestionsPool.length;
+      const correctCount = total - wrongAnswersList.length;
+      const pct = Math.round((correctCount / total) * 100);
+
+      document.getElementById('resCorrect').textContent = correctCount;
+      document.getElementById('resStats').textContent = `Puntuación: ${score} pts • Aciertos: ${pct}% • Racha Max: ${maxStreakSession}`;
+
+      const verdict = document.getElementById('resVerdict');
+      if (pct >= 90) {
+        verdict.textContent = "🏆 ¡Excelente! Ciberdefensor Maestro";
+        verdict.style.color = "var(--accent-green)";
+        soundFanfare();
+      } else if (pct >= 60) {
+        verdict.textContent = "👍 ¡Buen Trabajo! Aprobado";
+        verdict.style.color = "var(--accent-cyan)";
+      } else {
+        verdict.textContent = "⚠️ Necesitas Reforzar el 3x3";
+        verdict.style.color = "var(--accent-red)";
+      }
+
+      // Guardar estadísticas en localStorage
+      saveStats(correctCount, total);
+
+      // Manejo de fallos
+      const mistakesSec = document.getElementById('mistakesSection');
+      const mistakesList = document.getElementById('mistakesList');
+      if (wrongAnswersList.length > 0) {
+        mistakesSec.style.display = 'block';
+        mistakesList.innerHTML = '';
+        wrongAnswersList.forEach((m, i) => {
+          const div = document.createElement('div');
+          div.className = 'mistake-item';
+          div.innerHTML = `
+            <strong>${i + 1}. ${m.q}</strong>
+            <span style="color:#aaa;">${m.expl}</span>
+          `;
+          mistakesList.appendChild(div);
+        });
+      } else {
+        mistakesSec.style.display = 'none';
+      }
+    }
+
+    /* CONTROLADORES DE BOTONES DEL QUIZ */
+    document.getElementById('btnStartTopicQuiz').addEventListener('click', () => {
+      const tId = parseInt(document.getElementById('selectQuizTopic').value, 10);
+      startQuiz('topic', tId);
+    });
+
+    document.getElementById('btnStartRandomQuiz').addEventListener('click', () => {
+      startQuiz('random');
+    });
+
+    document.getElementById('btnRetryMistakes').addEventListener('click', () => {
+      startQuiz('mistakes');
+    });
+
+    document.getElementById('btnRestartQuiz').addEventListener('click', () => {
+      document.getElementById('quizResultsArea').style.display = 'none';
+      document.getElementById('quizSetupCard').style.display = 'block';
+    });
+
+    document.getElementById('btnReturnTo3x3').addEventListener('click', () => {
+      switchView('viewStudy');
+    });
+
+    /* ==========================================================================
+       8. SISTEMA DE ESTADÍSTICAS Y LOGROS
+       ========================================================================== */
+    function loadStats() {
+      const games = parseInt(localStorage.getItem('oled_games') || '0', 10);
+      const correct = parseInt(localStorage.getItem('oled_correct') || '0', 10);
+      const best = parseInt(localStorage.getItem('oled_beststreak') || '0', 10);
+
+      document.getElementById('statGamesPlayed').textContent = games;
+      document.getElementById('statTotalCorrect').textContent = correct;
+      document.getElementById('statBestStreak').textContent = `${best} seguidas`;
+
+      renderAchievements(games, correct, best);
+    }
+
+    function saveStats(correctInRound, totalInRound) {
+      let games = parseInt(localStorage.getItem('oled_games') || '0', 10) + 1;
+      let totalCorrect = parseInt(localStorage.getItem('oled_correct') || '0', 10) + correctInRound;
+      let bestStreak = parseInt(localStorage.getItem('oled_beststreak') || '0', 10);
+      if (maxStreakSession > bestStreak) bestStreak = maxStreakSession;
+
+      localStorage.setItem('oled_games', games);
+      localStorage.setItem('oled_correct', totalCorrect);
+      localStorage.setItem('oled_beststreak', bestStreak);
+
+      loadStats();
+    }
+
+    const ACHIEVEMENTS = [
+      { id: 'first', title: 'Novato de la Ciberinteligencia', desc: 'Completa tu primera partida de Quiz.', req: (g, c, s) => g >= 1 },
+      { id: 'streak5', title: 'Hacker Centrado (Racha x5)', desc: 'Consigue 5 aciertos seguidos sin fallar.', req: (g, c, s) => s >= 5 },
+      { id: 'master50', title: 'Especialista en Seguridad', desc: 'Acumula 50 aciertos globales en la app.', req: (g, c, s) => c >= 50 },
+      { id: 'streak10', title: 'Inmune a Exploits (Racha x10)', desc: 'Completa una ronda de 10 preguntas perfecta.', req: (g, c, s) => s >= 10 }
+    ];
+
+    function renderAchievements(games, correct, streak) {
+      const container = document.getElementById('achievementsList');
+      container.innerHTML = '';
+      ACHIEVEMENTS.forEach(a => {
+        const unlocked = a.req(games, correct, streak);
+        const item = document.createElement('div');
+        item.className = 'concept-item';
+        item.innerHTML = `
+          <div class="concept-dot" style="background: ${unlocked ? 'var(--accent-yellow)' : '#333'}"></div>
+          <div class="concept-content">
+            <strong style="color: ${unlocked ? '#fff' : '#666'}">${unlocked ? '🏅 ' : '🔒 '}${a.title}</strong>
+            <span style="color: ${unlocked ? '#bbb' : '#555'}">${a.desc}</span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    /* ==========================================================================
+       9. INICIALIZACIÓN DE LA APLICACIÓN
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      // Cargar tamaño de fuente previo
+      const savedFont = localStorage.getItem('oled_fontsize');
+      if (savedFont !== null) {
+        currentFontIdx = parseInt(savedFont, 10);
+        updateFontSize();
+      }
+
+      // Cargar contraste extremo previo
+      if (localStorage.getItem('oled_contrast') === '1') {
+        isExtremeContrast = true;
+        updateContrastMode();
+      }
+
+      // Cargar preferencia de sonido
+      if (localStorage.getItem('oled_sound') === '0') {
+        isSoundEnabled = false;
+        btnAudio.textContent = "🔇";
+      }
+
+      populateTopicSelectors();
+      renderStudyTopic(1);
+      loadStats();
+    });
+  </script>
+</body>
+</html>
